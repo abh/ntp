@@ -76,8 +76,8 @@ func TestValidate(t *testing.T) {
 	assert.NotNil(t, r)
 	assert.True(t, r.Validate()) // despite negative RTT!
 	assert.Equal(t, r.RTT, -3*time.Second)
-	assert.Equal(t, r.rootDistance(), 8*time.Second)        // does not account negative RTT
-	assert.Equal(t, r.causalityViolation(), 10*time.Second) // OriginTime / ReceiveTime
+	assert.Equal(t, r.RootDistance, 8*time.Second)        // does not account negative RTT
+	assert.Equal(t, r.CausalityViolation, 10*time.Second) // OriginTime / ReceiveTime
 }
 
 func TestCausality(t *testing.T) {
@@ -93,7 +93,7 @@ func TestCausality(t *testing.T) {
 	m.TransmitTime = 3 << 32
 	r = parseTime(&m, 4<<32)
 	assert.True(t, r.Validate())
-	assert.Equal(t, r.causalityViolation(), time.Duration(0))
+	assert.Equal(t, r.CausalityViolation, time.Duration(0))
 
 	var t1, t2, t3, t4 int64
 	for t1 = 1; t1 <= 10; t1++ {
@@ -119,7 +119,7 @@ func TestCausality(t *testing.T) {
 						} else {
 							caserr = d34
 						}
-						assert.Equal(t, r.causalityViolation(), time.Duration(caserr)*time.Second)
+						assert.Equal(t, r.CausalityViolation, time.Duration(caserr)*time.Second)
 					}
 				}
 			}
@@ -194,14 +194,14 @@ func testQueryVersion(version int, t *testing.T) {
 	t.Logf("[%s]    RefTime: %v", host, r.ReferenceTime) // it's displayed in UTC as NTP has no timezones
 	t.Logf("[%s]        RTT: %v", host, r.RTT)
 	t.Logf("[%s]     Offset: %v", host, r.ClockOffset)
-	t.Logf("[%s] !Causality: %v", host, r.causalityViolation())
+	t.Logf("[%s] !Causality: %v", host, r.CausalityViolation)
 	t.Logf("[%s]       Poll: %v", host, r.Poll)
 	t.Logf("[%s]  Precision: %v", host, r.Precision)
 	t.Logf("[%s]    Stratum: %v", host, r.Stratum)
 	t.Logf("[%s]      RefID: 0x%08x", host, r.ReferenceID)
 	t.Logf("[%s]  RootDelay: %v", host, r.RootDelay)
 	t.Logf("[%s]   RootDisp: %v", host, r.RootDispersion)
-	t.Logf("[%s]   RootDist: %v", host, r.rootDistance())
+	t.Logf("[%s]   RootDist: %v", host, r.RootDistance)
 	t.Logf("[%s]       Leap: %v", host, r.Leap)
 
 	assert.True(t, r.Validate())
